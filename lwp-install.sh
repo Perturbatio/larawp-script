@@ -2,6 +2,7 @@
 
 CURRENT_DIR="$( pwd )"
 SCRIPT_COMMAND_LOCATION="${BASH_SOURCE[0]}"
+SCRIPT_NAME="$( basename "${SCRIPT_COMMAND_LOCATION}" )"
 
 #determine if the script was run via a symlink
 SYMLINK_DESTINATION=`readlink ${SCRIPT_COMMAND_LOCATION}`
@@ -23,6 +24,7 @@ NC='\033[0m' # No Color
 
 if [[ -z $PROJECT_NAME ]]; then
 	echo -e "${RED}No project name specified${NC}"
+	echo -e "${GREEN}Usage: ${NC}${SCRIPT_NAME} <project_name>"
 	exit 1
 fi
 
