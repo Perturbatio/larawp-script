@@ -75,3 +75,8 @@ echo ""
 
 echo -e "${GREEN}You now need to modify the server config to point the wordpress URLs to below the document root"
 echo -e "an example config for apache is located at $RESOURCE_DIR/apache-additions.conf${NC}"
+echo ""
+echo -e "${ORANGE}Wordpress notes: ${NC}"
+echo -e "${GREEN}[1]:${NC} Remember to change the admin username to something else (admin is too common)"
+echo -e "${GREEN}[2]:${NC} Theme editing is disabled in the wp-config"
+echo -e "${GREEN}[3]:${NC} Core auto update is enabled in the wp-config"
