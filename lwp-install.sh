@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 
 CURRENT_DIR="$( pwd )"
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_COMMAND_LOCATION="${BASH_SOURCE[0]}"
+
+#determine if the script was run via a symlink
+SYMLINK_DESTINATION=`readlink ${SCRIPT_COMMAND_LOCATION}`
+
+if [[ -z $SYMLINK_DESTINATION ]]; then
+	#not using symlink
+	SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+else
+	#using symlink
+	SCRIPT_DIR="$( cd "$( dirname "${SYMLINK_DESTINATION}" )" && pwd )"
+fi
+
 RESOURCE_DIR="$SCRIPT_DIR/resources"
 PROJECT_NAME="$1"
 RED='\033[0;31m'
