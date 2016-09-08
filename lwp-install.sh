@@ -67,9 +67,9 @@ cp "$RESOURCE_DIR/config.wordpress.php" "$PROJECT_DIR/config/wordpress.php"
 echo -e "${GREEN}Done.${NC}"
 echo ""
 
-echo -e "${ORANGE}Copying Wordpress helper class to app/libraries...${NC}"
-mkdir "$PROJECT_DIR/app/libraries/"
-cp "$RESOURCE_DIR/app.libraries.Wordpress.php" "$PROJECT_DIR/app/libraries/Wordpress.php"
+echo -e "${ORANGE}Copying Wordpress helper class to app/Libraries...${NC}"
+mkdir "$PROJECT_DIR/app/Libraries/"
+cp "$RESOURCE_DIR/app.libraries.Wordpress.php" "$PROJECT_DIR/app/Libraries/Wordpress.php"
 echo -e "${GREEN}Done.${NC}"
 echo ""
 
