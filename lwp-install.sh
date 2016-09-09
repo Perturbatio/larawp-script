@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
+#define some colour constants
+RED='\033[0;31m'
+GREEN='\033[1;32m'
+ORANGE='\033[0;33m'
+NC='\033[0m' # No Colour
 
+# path setup
 CURRENT_DIR="$( pwd )"
 SCRIPT_COMMAND_LOCATION="${BASH_SOURCE[0]}"
 SCRIPT_NAME="$( basename "${SCRIPT_COMMAND_LOCATION}" )"
@@ -16,13 +22,35 @@ else
 fi
 
 RESOURCE_DIR="$SCRIPT_DIR/resources"
-PROJECT_NAME="$1"
+USE_COMPOSER=""
 
-#define some colour constants
-RED='\033[0;31m'
-GREEN='\033[1;32m'
-ORANGE='\033[0;33m'
-NC='\033[0m' # No Colour
+# get parameters
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    -n|--name)
+    	PROJECT_NAME="$2"
+    shift # past argument
+    ;;
+    -c|--use-composer)
+   		USE_COMPOSER=YES
+    shift # past argument
+    ;;
+    *)
+		# unknown option
+		# use the first unrecognised param as the project name if it's not already specified
+		if [[ -z "${PROJECT_NAME}" ]]; then
+			PROJECT_NAME="${key}"
+		else #otherwise throw an error
+			echo -e "${RED}Unknown option: ${NC}${key}."
+			exit 1
+		fi
+    ;;
+esac
+shift # past argument or value
+done
+
 
 if [[ -z ${PROJECT_NAME} ]]; then
 	echo -e "${RED}No project name specified${NC}"
@@ -36,13 +64,30 @@ LARAVEL_APP_DIR="${PROJECT_DIR}/app"
 CONTROLLERS_DIR="${LARAVEL_APP_DIR}/Http/Controllers"
 ROUTES_PATH="${PROJECT_DIR}/routes/web.php"
 
+#check that we're not trying to create the project in a pre-existing dir
+if [ -d "${PROJECT_DIR}" ]; then
+	echo -e "${RED}Project directory already exists (${PROJECT_DIR})${NC}"
+	exit 1
+fi
+
 # create the laravel project
 echo -e "${ORANGE}Creating laravel project...${NC}"
-laravel new "${PROJECT_NAME}"
+if [[ -z ${USE_COMPOSER} ]]; then
+	laravel new "${PROJECT_NAME}"
+else
+	composer create-project laravel/laravel "${PROJECT_NAME}"
+fi
 echo -e "${GREEN}Done.${NC}"
 echo ""
 
-cd "${PROJECT_NAME}"
+if [ ! -d "${PROJECT_DIR}" ]; then
+	echo -e "${RED}Unable to locate the project directory, aborting.${NC}"
+	echo -e "${GREEN}It may be that the laravel new command cannot locate the download.${NC}"
+	echo -e "${GREEN}Try running ${SCRIPT_COMMAND_LOCATION} ${PROJECT_NAME} --use-composer.${NC}"
+	exit 1
+fi
+
+cd "${PROJECT_DIR}"
 # install wordpress
 echo -e "${ORANGE}Installing wordpress...${NC}"
 composer require "johnpbloch/wordpress":"*"
@@ -195,4 +240,3 @@ echo ""
 echo -e "${ORANGE}Laravel notes: ${NC}"
 echo -e "${GREEN}[*]:${NC} Read the Corcel documentation at https://packagist.org/packages/jgrossi/corcel"
 echo -e "${GREEN}[*]:${NC} You may want to install barryvdh/laravel-debugbar to aid in development"
-
