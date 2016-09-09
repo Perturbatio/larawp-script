@@ -55,6 +55,7 @@ done
 if [[ -z ${PROJECT_NAME} ]]; then
 	echo -e "${RED}No project name specified${NC}"
 	echo -e "${GREEN}Usage: ${NC}${SCRIPT_NAME} <project_name>"
+	echo -e "${GREEN}Optional: ${NC}-c|--use-composer force use of composer for laravel install"
 	exit 1
 fi
 
