@@ -33,16 +33,19 @@ By default, the script will use the `laravel` command to install, but if there i
 Once installed:
 
 Next Steps: 
+
 1. You now need to modify the server config to point the wordpress URLs to below the document root
 an example config for apache is located at `larawp/resources/apache-additions.conf`
 2. Modify the `.env` file to set database settings (used in `config/wordpress.php`) and `wp-config.php`
 3. Set up the wordpress site via the web interface
 
 Wordpress notes: 
+
 * Remember to not make the admin username `admin` (common hack target)
 * Theme editing is disabled in the `wp-config`
 * Core auto update is enabled in the `wp-config`
 
 Laravel notes: 
+
 * Read the Corcel documentation at `https://packagist.org/packages/jgrossi/corcel`
 * to use the artisan command `wp:generate-keys`, add `\App\Console\Commands\WPGenerateKeys::class` to the $commands array in `app/Console/Kernel.php`
