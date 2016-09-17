@@ -4,6 +4,8 @@ require_once( $current_path . DIRECTORY_SEPARATOR . 'wp-bootstrap-laravel.php' )
 
 define( 'DISALLOW_FILE_EDIT', true );
 define( 'WP_AUTO_UPDATE_CORE', true );
+define( 'WP_HOME', config('app.url', '') );
+define( 'WP_SITEURL', config('app.url', '') );
 
 /**
  * The base configuration for WordPress

@@ -208,6 +208,13 @@ cp "${RESOURCE_DIR}/CatchallController.php" "${CONTROLLERS_DIR}/CatchallControll
 echo -e "${GREEN}Done.${NC}"
 echo ""
 
+# add the laravel commands for wordpress
+echo -e "${ORANGE}Copying wp:generate-keys artisan command to app/Commands...${NC}"
+mkdir "${PROJECT_DIR}/app/Commands/"
+cp "${RESOURCE_DIR}/app.commands.WPGenerateKeys.php" "${PROJECT_DIR}/app/Commands/WPGenerateKeys.php"
+echo -e "${GREEN}Done.${NC}"
+echo ""
+
 #Add Catchall route
 #NOTE: This assumes Laravel 5.3 where the routes are in routes/web.php (for WP routes at least)
 cd ${PROJECT_DIR}
@@ -293,6 +300,19 @@ db-imports
 
 EOT
 
+#add some items to the .env file
+cat <<EOT >>  ".env"
+
+WP_AUTH_KEY=put_a_secure_key_here
+WP_AUTH_SECURE_KEY=put_a_secure_key_here
+WP_AUTH_LOGGED_IN_KEY=put_a_secure_key_here
+WP_AUTH_NONCE_KEY=put_a_secure_key_here
+WP_AUTH_SALT=put_a_secure_key_here
+WP_AUTH_SECURE_SALT=put_a_secure_key_here
+WP_AUTH_LOGGED_IN_SALT=put_a_secure_key_here
+WP_AUTH_NONCE_SALT=put_a_secure_key_here
+
+EOT
 # Final Instructions
 echo -e "${ORANGE}Next Steps: ${NC}"
 echo -e "${GREEN}[1]: ${NC}You now need to modify the server config to point the wordpress URLs to below the document root"
@@ -307,3 +327,5 @@ echo -e "${GREEN}[*]:${NC} Core auto update is enabled in the wp-config"
 echo ""
 echo -e "${ORANGE}Laravel notes: ${NC}"
 echo -e "${GREEN}[*]:${NC} Read the Corcel documentation at https://packagist.org/packages/jgrossi/corcel"
+echo -e "${GREEN}[*]:${NC} to use the artisan command wp:generate-keys, add ${ORANGE}\App\Console\Commands\WPGenerateKeys::class${NC} to the \$commands array in ${ORANGE}${PROJECT_DIR}/app/Console/Kernel.php${NC}"
+
