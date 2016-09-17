@@ -233,6 +233,7 @@ Route::any( '{catchall}', [
 
 EOT
 
+echo -e "${ORANGE}Adding some .gitignore rules...${NC}"
 #Add some .gitignore rules
 cat <<EOT >> ".gitignore"
 #laravel related files
@@ -299,10 +300,14 @@ db-imports
 .usermin/
 
 EOT
+echo -e "${GREEN}Done.${NC}"
+echo ""
 
 #add some items to the .env file
+echo -e "${ORANGE}Adding WP_AUTH_xxx keys to .env...${NC}"
 cat <<EOT >>  ".env"
 
+# if you've enabled the wp:generate-keys command then you can regenerate these with 'artisan wp:generate-keys'
 WP_AUTH_KEY=put_a_secure_key_here
 WP_AUTH_SECURE_KEY=put_a_secure_key_here
 WP_AUTH_LOGGED_IN_KEY=put_a_secure_key_here
@@ -313,6 +318,27 @@ WP_AUTH_LOGGED_IN_SALT=put_a_secure_key_here
 WP_AUTH_NONCE_SALT=put_a_secure_key_here
 
 EOT
+echo -e "${GREEN}Done.${NC}"
+echo ""
+
+#add some items to the .env.example file
+echo -e "${ORANGE}Adding WP_AUTH_xxx keys to .env.example...${NC}"
+cat <<EOT >>  ".env.example"
+
+# if you've enabled the wp:generate-keys command then you can regenerate these with 'artisan wp:generate-keys'
+WP_AUTH_KEY=put_a_secure_key_here
+WP_AUTH_SECURE_KEY=put_a_secure_key_here
+WP_AUTH_LOGGED_IN_KEY=put_a_secure_key_here
+WP_AUTH_NONCE_KEY=put_a_secure_key_here
+WP_AUTH_SALT=put_a_secure_key_here
+WP_AUTH_SECURE_SALT=put_a_secure_key_here
+WP_AUTH_LOGGED_IN_SALT=put_a_secure_key_here
+WP_AUTH_NONCE_SALT=put_a_secure_key_here
+
+EOT
+echo -e "${GREEN}Done.${NC}"
+echo ""
+
 # Final Instructions
 echo -e "${ORANGE}Next Steps: ${NC}"
 echo -e "${GREEN}[1]: ${NC}You now need to modify the server config to point the wordpress URLs to below the document root"
