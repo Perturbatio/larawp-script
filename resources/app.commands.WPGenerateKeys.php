@@ -47,7 +47,7 @@ class WPGenerateKeys extends Command {
         $description .= static::$shellColours['ORANGE'] . "Keys available:" . static::$shellColours['NORMAL'] . PHP_EOL;
 
         foreach ((array) static::$keys as $configKey => $envKey) {
-            $description .= static::$shellColours['GREEN'] . "{$configKey}:" . static::$shellColours['NORMAL'] . " {$envKey}" . PHP_EOL;
+            $description .= 'wordpress.auth.' . static::$shellColours['GREEN'] . "{$configKey}:" . static::$shellColours['NORMAL'] . " {$envKey}" . PHP_EOL;
         }
         $description .= PHP_EOL . "\033[0;31mWARNING: if you do this once the wordpress database has been set up, 
          you will invalidate all logins and any encrypted values.\033[0m" . PHP_EOL;
