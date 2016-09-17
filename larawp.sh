@@ -59,11 +59,32 @@ if [[ -z ${PROJECT_NAME} ]]; then
 	exit 1
 fi
 
+while true; do
+
+	echo -e "${GREEN}[1]: ${NC}latest"
+	echo -e "${GREEN}[2]: ${NC}5.2.*"
+    read -p "Which version of Laravel do you want to install? " VERSION_SELECTION
+
+    case $VERSION_SELECTION in
+        [1]* )
+        	LARAVEL_VERSION="latest"
+        	ROUTES_PATH="${PROJECT_DIR}/routes/web.php"
+        break;;
+        [2]* )
+        	LARAVEL_VERSION="5.2.*"
+        	ROUTES_PATH="${PROJECT_DIR}/app/Http/routes.php"
+        break;;
+        * )
+        	echo
+        	echo "Please choose a version"
+        ;;
+    esac
+done
+
 PROJECT_DIR="$CURRENT_DIR/${PROJECT_NAME}"
 WP_DIR="${PROJECT_DIR}/wordpress"
 LARAVEL_APP_DIR="${PROJECT_DIR}/app"
 CONTROLLERS_DIR="${LARAVEL_APP_DIR}/Http/Controllers"
-ROUTES_PATH="${PROJECT_DIR}/routes/web.php"
 
 #check that we're not trying to create the project in a pre-existing dir
 if [ -d "${PROJECT_DIR}" ]; then
@@ -73,10 +94,19 @@ fi
 
 # create the laravel project
 echo -e "${ORANGE}Creating laravel project...${NC}"
-if [[ -z ${USE_COMPOSER} ]]; then
+if [[ -z ${USE_COMPOSER} && ${LARAVEL_VERSION} = "latest" ]]; then
 	laravel new "${PROJECT_NAME}"
 else
-	composer create-project laravel/laravel "${PROJECT_NAME}"
+	case $LARAVEL_VERSION in
+        ["latest"]* )
+        	LARAVEL_VERSION="laravel/laravel"
+        ;;
+        * )
+        	LARAVEL_VERSION="laravel/laravel:${LARAVEL_VERSION}"
+        ;;
+
+	esac
+	composer create-project $LARAVEL_VERSION "${PROJECT_NAME}"
 fi
 echo -e "${GREEN}Done.${NC}"
 echo ""
@@ -98,7 +128,18 @@ echo ""
 # install packages via composer
 
 echo -e "${ORANGE}Installing laravelcollective/html...${NC}"
-composer require "laravelcollective/html":"5.3.*"
+	case $LARAVEL_VERSION in
+        ["latest"]* )
+        	LARAVELCOLLECTIVE_VERSION="laravelcollective/html"
+        ;;
+        * )
+        	LARAVELCOLLECTIVE_VERSION="laravelcollective/html:5.2.4"
+        ;;
+
+	esac
+echo $LARAVELCOLLECTIVE_VERSION
+exit
+composer require $LARAVELCOLLECTIVE_VERSION
 echo -e "${GREEN}Done.${NC}"
 echo ""
 
