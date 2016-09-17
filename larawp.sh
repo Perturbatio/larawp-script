@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+################################### SETUP ######################################
 #define some colour constants
 RED='\033[0;31m'
 GREEN='\033[1;32m'
@@ -24,6 +25,23 @@ fi
 RESOURCE_DIR="$SCRIPT_DIR/resources"
 USE_COMPOSER=""
 
+#######################################
+# helper to install composer packages #
+#######################################
+function requireComposerPackage(){
+	if [[ ${2} = "dev" ]]; then
+		COMPOSER_COMMAND_OPTIONS="--dev"
+	else
+		COMPOSER_COMMAND_OPTIONS=""
+	fi
+
+	echo -e "${ORANGE}Installing ${1}...${NC}"
+	composer require ${COMPOSER_COMMAND_OPTIONS} $1
+	echo -e "${GREEN}Done.${NC}"
+	echo ""
+}
+
+########################################## END SETUP ####################################################
 # get parameters
 while [[ $# -gt 0 ]]
 do
@@ -35,7 +53,6 @@ case $key in
     ;;
     -c|--use-composer)
    		USE_COMPOSER=YES
-    shift # past argument
     ;;
     *)
 		# unknown option
@@ -59,6 +76,10 @@ if [[ -z ${PROJECT_NAME} ]]; then
 	exit 1
 fi
 
+echo ""
+echo "Detected project name as ${PROJECT_NAME}"
+echo ""
+
 while true; do
 
 	echo -e "${GREEN}[1]: ${NC}latest"
@@ -68,11 +89,11 @@ while true; do
     case $VERSION_SELECTION in
         [1]* )
         	LARAVEL_VERSION="latest"
-        	ROUTES_PATH="${PROJECT_DIR}/routes/web.php"
+        	ROUTES_PATH="routes/web.php"
         break;;
         [2]* )
         	LARAVEL_VERSION="5.2.*"
-        	ROUTES_PATH="${PROJECT_DIR}/app/Http/routes.php"
+        	ROUTES_PATH="app/Http/routes.php"
         break;;
         * )
         	echo
@@ -80,6 +101,7 @@ while true; do
         ;;
     esac
 done
+
 
 PROJECT_DIR="$CURRENT_DIR/${PROJECT_NAME}"
 WP_DIR="${PROJECT_DIR}/wordpress"
@@ -92,9 +114,17 @@ if [ -d "${PROJECT_DIR}" ]; then
 	exit 1
 fi
 
+# check if laravel command is available
+if hash laravel 2>/dev/null; then
+	LARAVEL_COMMAND_EXISTS=true
+else
+	LARAVEL_COMMAND_EXISTS=false
+fi
+
+
 # create the laravel project
 echo -e "${ORANGE}Creating laravel project...${NC}"
-if [[ -z ${USE_COMPOSER} && ${LARAVEL_VERSION} = "latest" ]]; then
+if [[ -z ${USE_COMPOSER} && ${LARAVEL_VERSION} = "latest" && ${LARAVEL_COMMAND_EXISTS} = true ]]; then
 	laravel new "${PROJECT_NAME}"
 else
 	case $LARAVEL_VERSION in
@@ -113,23 +143,20 @@ echo ""
 
 if [ ! -d "${PROJECT_DIR}" ]; then
 	echo -e "${RED}Unable to locate the project directory, aborting.${NC}"
-	echo -e "${GREEN}It may be that the laravel new command cannot locate the download.${NC}"
+	echo -e "${GREEN}It may be that the laravel new command cannot locate the download (remote server may be down).${NC}"
 	echo -e "${GREEN}Try running ${SCRIPT_COMMAND_LOCATION} ${PROJECT_NAME} --use-composer.${NC}"
 	exit 1
 fi
 
 cd "${PROJECT_DIR}"
 # install wordpress
-echo -e "${ORANGE}Installing wordpress...${NC}"
-composer require "johnpbloch/wordpress":"*"
-echo -e "${GREEN}Done.${NC}"
-echo ""
+requireComposerPackage "johnpbloch/wordpress":"*"
 
 # install packages via composer
 
 echo -e "${ORANGE}Installing laravelcollective/html...${NC}"
 	case $LARAVEL_VERSION in
-        ["latest"]* )
+        "latest" )
         	LARAVELCOLLECTIVE_VERSION="laravelcollective/html"
         ;;
         * )
@@ -137,16 +164,14 @@ echo -e "${ORANGE}Installing laravelcollective/html...${NC}"
         ;;
 
 	esac
-echo $LARAVELCOLLECTIVE_VERSION
-exit
-composer require $LARAVELCOLLECTIVE_VERSION
-echo -e "${GREEN}Done.${NC}"
-echo ""
 
-echo -e "${ORANGE}Installing jgrossi/corcel...${NC}"
-composer require jgrossi/corcel
-echo -e "${GREEN}Done.${NC}"
-echo ""
+requireComposerPackage ${LARAVELCOLLECTIVE_VERSION}
+
+#corcel
+requireComposerPackage "jgrossi/corcel"
+
+#debugbar
+requireComposerPackage "barryvdh/laravel-debugbar" dev
 
 echo -e "${ORANGE}Patching laravel index.php...${NC}"
 cd "${PROJECT_DIR}/public"
@@ -185,6 +210,7 @@ echo ""
 
 #Add Catchall route
 #NOTE: This assumes Laravel 5.3 where the routes are in routes/web.php (for WP routes at least)
+cd ${PROJECT_DIR}
 cat <<EOT >>  "${ROUTES_PATH}"
 
 /**************************************************************
@@ -201,7 +227,7 @@ Route::any( '{catchall}', [
 EOT
 
 #Add some .gitignore rules
-cat <<EOT >> "${PROJECT_DIR}/.gitignore"
+cat <<EOT >> ".gitignore"
 #laravel related files
 storage/debugbar
 .env
@@ -281,4 +307,3 @@ echo -e "${GREEN}[*]:${NC} Core auto update is enabled in the wp-config"
 echo ""
 echo -e "${ORANGE}Laravel notes: ${NC}"
 echo -e "${GREEN}[*]:${NC} Read the Corcel documentation at https://packagist.org/packages/jgrossi/corcel"
-echo -e "${GREEN}[*]:${NC} You may want to install barryvdh/laravel-debugbar to aid in development"
