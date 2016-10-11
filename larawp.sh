@@ -209,9 +209,10 @@ echo -e "${GREEN}Done.${NC}"
 echo ""
 
 # add the laravel commands for wordpress
+#todo: check that this works with the latest laravel
 echo -e "${ORANGE}Copying wp:generate-keys artisan command to app/Commands...${NC}"
-mkdir "${PROJECT_DIR}/app/Commands/"
-cp "${RESOURCE_DIR}/app.commands.WPGenerateKeys.php" "${PROJECT_DIR}/app/Commands/WPGenerateKeys.php"
+mkdir "${PROJECT_DIR}/app/Console/Commands/"
+cp "${RESOURCE_DIR}/app.console.commands.WpGenerateKeys.php" "${PROJECT_DIR}/app/Console/Commands/WpGenerateKeys.php"
 echo -e "${GREEN}Done.${NC}"
 echo ""
 

@@ -150,7 +150,7 @@ class Wordpress {
 				 */
 				$queryCollector = $debugBar->getCollector( 'queries' );
 
-				$debugBar->addMessage( $wp_query, 'wpquery' );
+				$debugBar->addMessage( $wp_query, 'wp_query_object' );
 
 				foreach ( static::getQueries() as $query ) {
 
@@ -172,6 +172,14 @@ class Wordpress {
 	 * @return string
 	 */
 	public static function renderTemplate( $template_name, $params = [] ) {
+		$debug_enabled = config( 'app.debug', false );
+
+		if ( $debug_enabled && function_exists( 'stop_measure' ) ){
+			$app      = app();
+			$debugBar = $app[ 'debugbar' ];
+			$debugBar->addMessage( $template_name, 'Wordpress::renderTemplate' );
+		}
+
 		static::init();
 		$Wordpress__template_to_render = self::locateTemplate( $template_name );
 
@@ -281,8 +289,6 @@ class Wordpress {
 		} elseif ( is_tax() && $template = get_taxonomy_template() ) {
 		} elseif ( is_attachment( $route ) && $template = get_attachment_template() ) {
 			remove_filter( 'the_content', 'prepend_attachment' );
-
-			return $template;
 		} elseif ( is_single( $route ) && $template = get_single_template() ) {
 		} elseif ( is_page( $route ) && $template = get_page_template() ) {
 		} elseif ( is_category() && $template = get_category_template() ) {
@@ -295,9 +301,14 @@ class Wordpress {
 		} else {
 			$template = get_index_template();
 
-			return $template;
 		}
+		$debug_enabled = config( 'app.debug', false );
 
+		if ( $debug_enabled && function_exists( 'stop_measure' ) ){
+			$app      = app();
+			$debugBar = $app[ 'debugbar' ];
+			$debugBar->addMessage( $template, 'template' );
+		}
 		return $template;
 	}
 
