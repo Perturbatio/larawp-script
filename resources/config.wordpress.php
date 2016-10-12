@@ -12,7 +12,6 @@ return array(
 		'user'         => env( 'DB_USERNAME', '' ),
 		'password'     => env( 'DB_PASSWORD', '' ),
 		'host'         => env( 'DB_HOST', 'localhost' ),
-		'table_prefix' => env( 'DB_TABLE_PREFIX', 'wp_' ),
 	],
 	'auth'       => [
 		'key'            => env( 'WP_AUTH_KEY', '' ),

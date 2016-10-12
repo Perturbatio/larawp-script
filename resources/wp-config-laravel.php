@@ -71,7 +71,7 @@ define('NONCE_SALT',       config( 'wordpress.auth.nonce_salt' ));
  * You can have multiple installations in one database if you give each
  * a unique prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix = config('wordpress.database.table_prefix', 'wp_');
+$table_prefix = 'wp_';
 
 /**
  * For developers: WordPress debugging mode.
