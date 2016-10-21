@@ -10,7 +10,7 @@ class WpGenerateKeys extends Command {
 	 *
 	 * @var string
 	 */
-	protected $signature = 'wp:generate-keys {keyname?} {--show : Display the key instead of modifying files} {--with-config-key : Used in conjunction with --show to display the laravel config item key name}';
+	protected $signature = 'wp:generate-keys {keyname?} {--show : Display the key instead of modifying files}';
 
 	/**
 	 * The console command description.
@@ -51,9 +51,9 @@ class WpGenerateKeys extends Command {
 		foreach ((array) static::$keys as $configKey => $envKey) {
 			$help .= 'wordpress.auth.' . static::$shellColours['GREEN'] . "{$configKey} " . static::$shellColours['NORMAL'] . "( {$envKey} )" . PHP_EOL;
 		}
-
-		$help .= PHP_EOL . "\033[0;31mWARNING: if you do this once the wordpress database has been set up, 
-         you will invalidate all logins and any encrypted values.\033[0m" . PHP_EOL;
+		$help .= PHP_EOL . static::$shellColours['GREEN'] . 'use --verbose in conjunction with --show to display the laravel config key names';
+		$help .= PHP_EOL . static::$shellColours['RED'] . "WARNING: if you do this once the wordpress database has been set up, 
+         you will invalidate all logins and any encrypted values" . static::$shellColours['NORMAL'] . PHP_EOL;
 		$this->setHelp($help);
 	}
 
@@ -145,7 +145,7 @@ class WpGenerateKeys extends Command {
 				return $this->error("Error setting {$envKey}");
 			}
 		} else {
-			return (($showingConfigKey) ? PHP_EOL . "(wordpress.auth." . $configKey . ")" . PHP_EOL : '') . $envKey . '=' . $this->getConfigValue($configKey) . PHP_EOL;
+			return (($showingConfigKey) ? PHP_EOL . "[wordpress.auth." . $configKey . "]" . PHP_EOL : '') . $envKey . '=' . $this->getConfigValue($configKey) . PHP_EOL;
 		}
 	}
 
@@ -159,7 +159,7 @@ class WpGenerateKeys extends Command {
 		}
 
 		$showConfigKey = false;
-		if ($this->option('with-config-key')) {
+		if ($this->option('verbose')) {
 			$showConfigKey = true;
 
 		}
