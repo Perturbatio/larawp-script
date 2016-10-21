@@ -198,7 +198,7 @@ class Wordpress {
 			return ob_get_clean();
 
 		} else {
-			static::abort();
+			return static::abort();
 		}
 
 	}
@@ -206,7 +206,7 @@ class Wordpress {
 	/**
 	 * @return array
 	 */
-	public function getQueries() {
+	public static function getQueries() {
 		global $wpdb;
 
 		$result = [];
