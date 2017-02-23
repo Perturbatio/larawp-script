@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../wordpress/wp-includes/l10n.php';//workaround for the __ translation function conflicting with laravel's
 require_once __DIR__ . '/../bootstrap/autoload.php';
 require_once __DIR__ . '/../bootstrap/app.php';
 
