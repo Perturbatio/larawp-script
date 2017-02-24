@@ -1,43 +1,43 @@
 #!/usr/bin/env bash
 ################################### SETUP ######################################
 #define some colour constants
-RED='\033[0;31m'
-GREEN='\033[1;32m'
-ORANGE='\033[0;33m'
-NC='\033[0m' # No Colour
+red='\033[0;31m'
+green='\033[1;32m'
+orange='\033[0;33m'
+nocolour='\033[0m' # No Colour
 
 # path setup
-CURRENT_DIR="$( pwd )"
-SCRIPT_COMMAND_LOCATION="${BASH_SOURCE[0]}"
-SCRIPT_NAME="$( basename "${SCRIPT_COMMAND_LOCATION}" )"
+current_dir="$( pwd )"
+script_command_location="${BASH_SOURCE[0]}"
+script_name="$( basename "${script_command_location}" )"
 
 #determine if the script was run via a symlink
-SYMLINK_DESTINATION=`readlink ${SCRIPT_COMMAND_LOCATION}`
+symlink_destination=`readlink ${script_command_location}`
 
-if [[ -z $SYMLINK_DESTINATION ]]; then
+if [[ -z $symlink_destination ]]; then
 	#not using symlink
-	SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+	script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 else
 	#using symlink
-	SCRIPT_DIR="$( cd "$( dirname "${SYMLINK_DESTINATION}" )" && pwd )"
+	script_dir="$( cd "$( dirname "${symlink_destination}" )" && pwd )"
 fi
 
-RESOURCE_DIR="$SCRIPT_DIR/resources"
-USE_COMPOSER=""
+resource_dir="$script_dir/resources"
+use_composer=""
 
 #######################################
 # helper to install composer packages #
 #######################################
 function requireComposerPackage(){
 	if [[ ${2} = "dev" ]]; then
-		COMPOSER_COMMAND_OPTIONS="--dev"
+		composer_command_options="--dev"
 	else
-		COMPOSER_COMMAND_OPTIONS=""
+		composer_command_options=""
 	fi
 
-	echo -e "${ORANGE}Installing ${1}...${NC}"
-	composer require ${COMPOSER_COMMAND_OPTIONS} $1
-	echo -e "${GREEN}Done.${NC}"
+	echo -e "${orange}Installing ${1}...${nocolour}"
+	composer require ${composer_command_options} $1
+	echo -e "${green}Done.${nocolour}"
 	echo ""
 }
 
@@ -48,19 +48,19 @@ do
 key="$1"
 case $key in
     -n|--name)
-    	PROJECT_NAME="$2"
+    	project_name="$2"
     shift # past argument
     ;;
     -c|--use-composer)
-   		USE_COMPOSER=YES
+   		use_composer=YES
     ;;
     *)
 		# unknown option
 		# use the first unrecognised param as the project name if it's not already specified
-		if [[ -z "${PROJECT_NAME}" ]]; then
-			PROJECT_NAME="${key}"
+		if [[ -z "${project_name}" ]]; then
+			project_name="${key}"
 		else #otherwise throw an error
-			echo -e "${RED}Unknown option: ${NC}${key}."
+			echo -e "${red}Unknown option: ${nocolour}${key}."
 			exit 1
 		fi
     ;;
@@ -69,31 +69,31 @@ shift # past argument or value
 done
 
 
-if [[ -z ${PROJECT_NAME} ]]; then
-	echo -e "${RED}No project name specified${NC}"
-	echo -e "${GREEN}Usage: ${NC}${SCRIPT_NAME} <project_name>"
-	echo -e "${GREEN}Optional: ${NC}-c|--use-composer force use of composer for laravel install"
+if [[ -z ${project_name} ]]; then
+	echo -e "${red}No project name specified${nocolour}"
+	echo -e "${green}Usage: ${nocolour}${script_name} <project_name>"
+	echo -e "${green}Optional: ${nocolour}-c|--use-composer force use of composer for laravel install"
 	exit 1
 fi
 
 echo ""
-echo "Detected project name as ${PROJECT_NAME}"
+echo "Detected project name as ${project_name}"
 echo ""
 
 while true; do
 
-	echo -e "${GREEN}[1]: ${NC}latest"
-	echo -e "${GREEN}[2]: ${NC}5.2.*"
-    read -p "Which version of Laravel do you want to install? " VERSION_SELECTION
+	echo -e "${green}[1]: ${nocolour}latest"
+	echo -e "${green}[2]: ${nocolour}5.2.*"
+    read -p "Which version of Laravel do you want to install? " version_selection
 
-    case $VERSION_SELECTION in
+    case $version_selection in
         [1]* )
-        	LARAVEL_VERSION="latest"
-        	ROUTES_PATH="routes/web.php"
+        	laravel_version="latest"
+        	routes_path="routes/web.php"
         break;;
         [2]* )
-        	LARAVEL_VERSION="5.2.*"
-        	ROUTES_PATH="app/Http/routes.php"
+        	laravel_version="5.2.*"
+        	routes_path="app/Http/routes.php"
         break;;
         * )
         	echo
@@ -103,69 +103,69 @@ while true; do
 done
 
 
-PROJECT_DIR="$CURRENT_DIR/${PROJECT_NAME}"
-WP_DIR="${PROJECT_DIR}/wordpress"
-LARAVEL_APP_DIR="${PROJECT_DIR}/app"
-CONTROLLERS_DIR="${LARAVEL_APP_DIR}/Http/Controllers"
+project_dir="$current_dir/${project_name}"
+wp_dir="${project_dir}/wordpress"
+laravel_app_dir="${project_dir}/app"
+controllers_dir="${laravel_app_dir}/Http/Controllers"
 
 #check that we're not trying to create the project in a pre-existing dir
-if [ -d "${PROJECT_DIR}" ]; then
-	echo -e "${RED}Project directory already exists (${PROJECT_DIR})${NC}"
+if [ -d "${project_dir}" ]; then
+	echo -e "${red}Project directory already exists (${project_dir})${nocolour}"
 	exit 1
 fi
 
 # check if laravel command is available
 if hash laravel 2>/dev/null; then
-	LARAVEL_COMMAND_EXISTS=true
+	laravel_command_exists=true
 else
-	LARAVEL_COMMAND_EXISTS=false
+	laravel_command_exists=false
 fi
 
 
 # create the laravel project
-echo -e "${ORANGE}Creating laravel project...${NC}"
-if [[ -z ${USE_COMPOSER} && ${LARAVEL_VERSION} = "latest" && ${LARAVEL_COMMAND_EXISTS} = true ]]; then
-	laravel new "${PROJECT_NAME}"
+echo -e "${orange}Creating laravel project...${nocolour}"
+if [[ -z ${use_composer} && ${laravel_version} = "latest" && ${laravel_command_exists} = true ]]; then
+	laravel new "${project_name}"
 else
-	case $LARAVEL_VERSION in
+	case $laravel_version in
         ["latest"]* )
-        	LARAVEL_VERSION="laravel/laravel"
+        	laravel_version="laravel/laravel"
         ;;
         * )
-        	LARAVEL_VERSION="laravel/laravel:${LARAVEL_VERSION}"
+        	laravel_version="laravel/laravel:${laravel_version}"
         ;;
 
 	esac
-	composer create-project $LARAVEL_VERSION "${PROJECT_NAME}"
+	composer create-project $laravel_version "${project_name}"
 fi
-echo -e "${GREEN}Done.${NC}"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
-if [ ! -d "${PROJECT_DIR}" ]; then
-	echo -e "${RED}Unable to locate the project directory, aborting.${NC}"
-	echo -e "${GREEN}It may be that the laravel new command cannot locate the download (remote server may be down).${NC}"
-	echo -e "${GREEN}Try running ${SCRIPT_COMMAND_LOCATION} ${PROJECT_NAME} --use-composer.${NC}"
+if [ ! -d "${project_dir}" ]; then
+	echo -e "${red}Unable to locate the project directory, aborting.${nocolour}"
+	echo -e "${green}It may be that the laravel new command cannot locate the download (remote server may be down).${nocolour}"
+	echo -e "${green}Try running ${script_command_location} ${project_name} --use-composer.${nocolour}"
 	exit 1
 fi
 
-cd "${PROJECT_DIR}"
+cd "${project_dir}"
 # install wordpress
 requireComposerPackage "johnpbloch/wordpress":"*"
 
 # install packages via composer
 
-echo -e "${ORANGE}Installing laravelcollective/html...${NC}"
-	case $LARAVEL_VERSION in
+echo -e "${orange}Installing laravelcollective/html...${nocolour}"
+	case $laravel_version in
         "latest" )
-        	LARAVELCOLLECTIVE_VERSION="laravelcollective/html"
+        	laravelcollective_version="laravelcollective/html"
         ;;
         * )
-        	LARAVELCOLLECTIVE_VERSION="laravelcollective/html:5.2.4"
+        	laravelcollective_version="laravelcollective/html:5.2.4"
         ;;
 
 	esac
 
-requireComposerPackage ${LARAVELCOLLECTIVE_VERSION}
+requireComposerPackage ${laravelcollective_version}
 
 #corcel
 requireComposerPackage "jgrossi/corcel"
@@ -173,53 +173,58 @@ requireComposerPackage "jgrossi/corcel"
 #debugbar
 requireComposerPackage "barryvdh/laravel-debugbar" dev
 
-echo -e "${ORANGE}Patching laravel index.php...${NC}"
-cd "${PROJECT_DIR}/public"
-patch -u < "${RESOURCE_DIR}/laravel.index.patch"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Patching laravel index.php...${nocolour}"
+cd "${project_dir}/public"
+patch -u < "${resource_dir}/laravel.index.patch"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
-cd "${PROJECT_DIR}"
+cd "${project_dir}"
 
-echo -e "${ORANGE}Creating wp-config.php with laravel mods...${NC}"
-cp "${RESOURCE_DIR}/wp-config-laravel.php" "$WP_DIR/wp-config.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying files to wordpress dir...${nocolour}"
+cp "${resource_dir}/wordpress/*" "$wp_dir/"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
-echo -e "${ORANGE}Copying wp-bootstrap-laravel.php...${NC}"
-cp "${RESOURCE_DIR}/wordpress.wp-bootstrap-laravel.php" "$WP_DIR/wp-bootstrap-laravel.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying laravel config files...${nocolour}"
+cp "${resource_dir}/config/"* "${project_dir}/config/"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
-echo -e "${ORANGE}Copying laravel based wordpress config file...${NC}"
-cp "${RESOURCE_DIR}/config.wordpress.php" "${PROJECT_DIR}/config/wordpress.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying Libraries to app/Libraries...${nocolour}"
+mkdir "${project_dir}/app/Libraries/"
+cp "${resource_dir}/app.Libraries/"* "${project_dir}/app/Libraries/"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
-echo -e "${ORANGE}Copying Wordpress helper class to app/Libraries...${NC}"
-mkdir "${PROJECT_DIR}/app/Libraries/"
-cp "${RESOURCE_DIR}/app.libraries.Wordpress.php" "${PROJECT_DIR}/app/Libraries/Wordpress.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying Listeners to app/Listeners...${nocolour}"
+cp "${resource_dir}/app.Listeners/"* "${project_dir}/app/Listeners"
+echo -e "${green}Done.${nocolour}"
+echo ""
+
+echo -e "${orange}Copying Providers to app/Providers...${nocolour}"
+cp "${resource_dir}/app.Providers/"* "${project_dir}/app/Providers"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 # Add Catchall controller
-echo -e "${ORANGE}Copying ${RESOURCE_DIR}/CatchallController.php to ${CONTROLLERS_DIR}/CatchallController.php...${NC}"
-cp "${RESOURCE_DIR}/CatchallController.php" "${CONTROLLERS_DIR}/CatchallController.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying Controllers...${nocolour}"
+cp "${resource_dir}/app.Http.Controllers/"* "${controllers_dir}/"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 # add the laravel commands for wordpress
 #todo: check that this works with the latest laravel
-echo -e "${ORANGE}Copying wp:generate-keys artisan command to app/Commands...${NC}"
-mkdir "${PROJECT_DIR}/app/Console/Commands/"
-cp "${RESOURCE_DIR}/app.console.commands.WpGenerateKeys.php" "${PROJECT_DIR}/app/Console/Commands/WpGenerateKeys.php"
-echo -e "${GREEN}Done.${NC}"
+echo -e "${orange}Copying console commands to app/Console/Commands...${nocolour}"
+mkdir "${project_dir}/app/Console/Commands/"
+cp "${resource_dir}/app.Console.Commands/"* "${project_dir}/app/Console/Commands/"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 #Add Catchall route
 #NOTE: This assumes Laravel 5.3 where the routes are in routes/web.php (for WP routes at least)
-cd ${PROJECT_DIR}
-cat <<EOT >>  "${ROUTES_PATH}"
+cd ${project_dir}
+cat <<EOT >>  "${routes_path}"
 
 /**************************************************************
  fallback to catchall controller if no other route matches and
@@ -234,7 +239,7 @@ Route::any( '{catchall}', [
 
 EOT
 
-echo -e "${ORANGE}Adding some .gitignore rules...${NC}"
+echo -e "${orange}Adding some .gitignore rules...${nocolour}"
 #Add some .gitignore rules
 cat <<EOT >> ".gitignore"
 #laravel related files
@@ -301,11 +306,11 @@ db-imports
 .usermin/
 
 EOT
-echo -e "${GREEN}Done.${NC}"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 #add some items to the .env file
-echo -e "${ORANGE}Adding WP_AUTH_xxx keys to .env...${NC}"
+echo -e "${orange}Adding WP_AUTH_xxx keys to .env...${nocolour}"
 cat <<EOT >>  ".env"
 
 # if you've enabled the wp:generate-keys command then you can regenerate these with 'artisan wp:generate-keys'
@@ -319,11 +324,11 @@ WP_AUTH_LOGGED_IN_SALT=put_a_secure_key_here
 WP_AUTH_NONCE_SALT=put_a_secure_key_here
 
 EOT
-echo -e "${GREEN}Done.${NC}"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 #add some items to the .env.example file
-echo -e "${ORANGE}Adding WP_AUTH_xxx keys to .env.example...${NC}"
+echo -e "${orange}Adding WP_AUTH_xxx keys to .env.example...${nocolour}"
 cat <<EOT >>  ".env.example"
 
 # if you've enabled the wp:generate-keys command then you can regenerate these with 'artisan wp:generate-keys'
@@ -337,22 +342,29 @@ WP_AUTH_LOGGED_IN_SALT=put_a_secure_key_here
 WP_AUTH_NONCE_SALT=put_a_secure_key_here
 
 EOT
-echo -e "${GREEN}Done.${NC}"
+echo -e "${green}Done.${nocolour}"
 echo ""
 
 # Final Instructions
-echo -e "${ORANGE}Next Steps: ${NC}"
-echo -e "${GREEN}[1]: ${NC}You now need to modify the server config to point the wordpress URLs to below the document root"
-echo -e "an example config for apache is located at ${RESOURCE_DIR}/apache-additions.conf${NC}"
-echo -e "${GREEN}[2]: ${NC}Modify the .env file in ${PROJECT_DIR}/.env to set database settings (used in ${PROJECT_DIR}/config/wordpress.php) and wp-config.php"
-echo -e "${GREEN}[3]: ${NC}Set up the wordpress site via the web interface"
+echo -e "${orange}Next Steps: ${nocolour}"
+echo -e "${green}[1]: ${nocolour}You now need to modify the server config to point the wordpress URLs to below the document root"
+echo -e "an example config for apache is located at ${resource_dir}/apache-additions.conf${nocolour}"
+echo -e "${green}[2]: ${nocolour}Modify the .env file in ${project_dir}/.env to set database settings (used in ${project_dir}/config/wordpress.php) and wp-config.php"
+echo -e "${green}[3]: ${nocolour}Set up the wordpress site via the web interface"
 echo ""
-echo -e "${ORANGE}Wordpress notes: ${NC}"
-echo -e "${GREEN}[*]:${NC} Remember to not make the admin username 'admin' (common hack target)"
-echo -e "${GREEN}[*]:${NC} Theme editing is disabled in the wp-config"
-echo -e "${GREEN}[*]:${NC} Core auto update is enabled in the wp-config"
+echo -e "${orange}Wordpress notes: ${nocolour}"
+echo -e "${green}[*]:${nocolour} Remember to not make the admin username 'admin' (common hack target)"
+echo -e "${green}[*]:${nocolour} Theme editing is disabled in the wp-config"
+echo -e "${green}[*]:${nocolour} Core auto update is enabled in the wp-config"
 echo ""
-echo -e "${ORANGE}Laravel notes: ${NC}"
-echo -e "${GREEN}[*]:${NC} Read the Corcel documentation at https://packagist.org/packages/jgrossi/corcel"
-echo -e "${GREEN}[*]:${NC} to use the artisan command wp:generate-keys, add ${ORANGE}\App\Console\Commands\WPGenerateKeys::class${NC} to the \$commands array in ${ORANGE}${PROJECT_DIR}/app/Console/Kernel.php${NC}"
+echo -e "${orange}Laravel notes: ${nocolour}"
+echo -e "${green}[*]:${nocolour} Read the Corcel documentation at https://packagist.org/packages/jgrossi/corcel"
+echo -e "${green}[*]:${nocolour} to use the artisan command wp:generate-keys, add ${orange}\App\Console\Commands\WpGenerateKeys::class${nocolour} to the \$commands array in ${orange}${project_dir}/app/Console/Kernel.php${nocolour}"
+echo -e "${green}[*]:${nocolour} to use the debugbar, follow the instructions at ${orange}https://github.com/barryvdh/laravel-debugbar/blob/master/readme.md${nocolour}"
+echo -e "${green}[*]:${nocolour} Add:"
+echo -e "${orange}} 	    $this->app->singleton(Wildcache::class, function ( $app ) {"
+echo -e " 		    return new Wildcache();"
+echo -e " 	    });${nocolour}"
+echo -e "AppServiceProvider.php, follow the instructions at ${orange}https://github.com/barryvdh/laravel-debugbar/blob/master/readme.md${nocolour}"
+
 
