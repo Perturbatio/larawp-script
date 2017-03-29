@@ -48,4 +48,4 @@ Wordpress notes:
 Laravel notes: 
 
 * Read the Corcel documentation at `https://packagist.org/packages/jgrossi/corcel`
-* to use the artisan command `wp:generate-keys`, add `\App\Console\Commands\WPGenerateKeys::class` to the $commands array in `app/Console/Kernel.php`
+* to use the artisan command `wp:generate-keys`, add `\App\Console\Commands\WpGenerateKeys::class` to the $commands array in `app/Console/Kernel.php`
