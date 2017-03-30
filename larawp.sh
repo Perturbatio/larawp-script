@@ -182,7 +182,7 @@ echo ""
 cd "${project_dir}"
 
 echo -e "${orange}Copying files to wordpress dir...${nocolour}"
-cp "${resource_dir}/wordpress/*" "$wp_dir/"
+cp "${resource_dir}/wordpress/"* "$wp_dir/"
 echo -e "${green}Done.${nocolour}"
 echo ""
 
