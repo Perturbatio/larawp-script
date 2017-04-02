@@ -89,10 +89,12 @@ while true; do
     case $version_selection in
         [1]* )
         	laravel_version="latest"
+        	patch_version="5.4"
         	routes_path="routes/web.php"
         break;;
         [2]* )
         	laravel_version="5.2.*"
+        	patch_version="5.3"
         	routes_path="app/Http/routes.php"
         break;;
         * )
@@ -172,10 +174,15 @@ requireComposerPackage "jgrossi/corcel"
 
 #debugbar
 requireComposerPackage "barryvdh/laravel-debugbar" dev
+#
+#echo -e "${orange}Patching laravel index.php...${nocolour}"
+#cd "${project_dir}/public"
+#patch -u < "${resource_dir}/laravel.${patch_version}.index.patch"
+#echo -e "${green}Done.${nocolour}"
+#echo ""
 
-echo -e "${orange}Patching laravel index.php...${nocolour}"
-cd "${project_dir}/public"
-patch -u < "${resource_dir}/laravel.index.patch"
+echo -e "${orange}Copying laravel public files...${nocolour}"
+cp "${resource_dir}/public/"* "public/"
 echo -e "${green}Done.${nocolour}"
 echo ""
 
